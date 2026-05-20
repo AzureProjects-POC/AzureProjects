@@ -1,31 +1,16 @@
-# Azure Projects
+# Azure ChangeLens Prototype Website
 
-Welcome to the Azure Projects repository! This repository contains various Azure cloud projects and solutions.
+Static GitHub Pages-ready site for presenting the Azure ChangeLens prototype.
 
-## About
+## Deploy to GitHub Pages
 
-This repository showcases Azure cloud computing projects, including infrastructure, applications, and cloud solutions built on the Microsoft Azure platform.
+1. Create a new GitHub repository, for example `azure-changelens`.
+2. Upload `index.html` and `styles.css` to the repository root.
+3. Go to **Settings → Pages**.
+4. Under **Build and deployment**, select **Deploy from a branch**.
+5. Select branch `main` and folder `/root`.
+6. Save and open the published GitHub Pages URL.
 
-## Getting Started
+## Customize
 
-To get started with these projects, you'll need:
-
-- An Azure subscription
-- Azure CLI or Azure Portal access
-- Required tools and SDKs for your specific project
-
-## Projects
-
-Add your project descriptions here as they are added to this repository.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues for any improvements or bug reports.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-
-For questions or inquiries, please reach out to the repository owner.
+Edit `index.html` to replace sample resource names, screenshots, or output.

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Azure ChangeLens | Operational Change Context Explorer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav">
+      <div class="brand"><span class="brand-mark">CL</span> Azure ChangeLens</div>
+      <div class="nav-links">
+        <a href="#problem">Problem</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#demo">Demo Output</a>
+        <a href="#roadmap">Roadmap</a>
+      </div>
+    </nav>
+
+    <section class="hero-content">
+      <p class="eyebrow">Prototype Concept</p>
+      <h1>Operational Change Context Explorer</h1>
+      <p class="hero-subtitle">
+        A lightweight Azure-native exploration that surfaces recent changes across operationally related resources around an incident window.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#demo">View Sample Investigation</a>
+        <a class="btn secondary" href="#architecture">See Architecture</a>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section id="problem" class="section two-col">
+      <div>
+        <p class="section-label">Problem Statement</p>
+        <h2>Incidents often start with one resource, but the relevant change may be somewhere nearby.</h2>
+        <p>
+          During operational incidents, application teams may investigate only the directly affected Azure resource while changes may have occurred in related networking, security, or connectivity resources.
+        </p>
+        <p>
+          Example: an on-prem application fails to access an Azure Storage Account. The storage account may show no direct change, but a related Private Endpoint, NSG, Route Table, or connectivity resource may have changed within the same time window.
+        </p>
+      </div>
+      <div class="scenario-card">
+        <h3>Example Scenario</h3>
+        <div class="flow-line">On-prem App</div>
+        <div class="arrow">↓</div>
+        <div class="flow-line">ExpressRoute / VPN</div>
+        <div class="arrow">↓</div>
+        <div class="flow-line">Private Endpoint</div>
+        <div class="arrow">↓</div>
+        <div class="flow-line">Subnet / NSG / Route Table</div>
+        <div class="arrow">↓</div>
+        <div class="flow-line highlight">Azure Storage Account</div>
+      </div>
+    </section>
+
+    <section id="workflow" class="section">
+      <p class="section-label">Prototype Workflow</p>
+      <h2>Simple investigation flow</h2>
+      <div class="steps">
+        <div class="step"><span>1</span><h3>Input</h3><p>Resource ID and time window.</p></div>
+        <div class="step"><span>2</span><h3>Discover</h3><p>Find operationally related Azure resources.</p></div>
+        <div class="step"><span>3</span><h3>Check</h3><p>Read Activity Log changes in that window.</p></div>
+        <div class="step"><span>4</span><h3>Surface</h3><p>Print relevant resource changes for investigation.</p></div>
+      </div>
+    </section>
+
+    <section id="architecture" class="section architecture">
+      <p class="section-label">Architecture</p>
+      <h2>Azure-native, read-only, lightweight</h2>
+      <div class="arch-grid">
+        <div class="arch-node">User Input<br/><small>Resource + Time Window</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">Automation Runbook<br/><small>Managed Identity</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">Resource Graph<br/><small>Relationship Discovery</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">Activity Logs<br/><small>Change Visibility</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node output">Change Output<br/><small>Investigation Context</small></div>
+      </div>
+      <div class="notes">
+        <div><strong>Access model:</strong> Reader + Monitoring Reader.</div>
+        <div><strong>Current scope:</strong> management-plane resource changes, not runtime RCA.</div>
+      </div>
+    </section>
+
+    <section id="demo" class="section demo-section">
+      <p class="section-label">Sample Investigation Output</p>
+      <h2>Storage Account relationship discovery + change visibility</h2>
+      <div class="demo-grid">
+        <div class="panel">
+          <h3>Input</h3>
+          <label>Resource</label>
+          <div class="input-box">/subscriptions/.../storageAccounts/azurechangelenssa</div>
+          <label>Window</label>
+          <div class="input-box">Last 1 hour</div>
+        </div>
+        <div class="panel">
+          <h3>Related Resources</h3>
+          <ul class="resource-list">
+            <li><span>Private Endpoint</span><code>ChglensSAPE</code></li>
+            <li><span>Subnet</span><code>SubnetChglense</code></li>
+            <li><span>Network Security Group</span><code>NSGchglens</code></li>
+            <li><span>Route Table</span><code>RTChglens</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-header"><span></span><span></span><span></span> Azure ChangeLens Output</div>
+<pre>===== Correlated Resource Changes =====
+
+Time      : 2026-05-19T19:46:21Z
+Operation : Microsoft.Network/networkSecurityGroups/securityRules/write
+Caller    : user@example.com
+Status    : Succeeded
+Resource  : .../networkSecurityGroups/NSGchglens/securityRules/test-rule
+
+Time      : 2026-05-19T19:44:03Z
+Operation : Microsoft.Network/routeTables/routes/write
+Caller    : user@example.com
+Status    : Succeeded
+Resource  : .../routeTables/RTChglens/routes/test-route</pre>
+      </div>
+    </section>
+
+    <section class="section limitations">
+      <p class="section-label">Current Scope & Limitations</p>
+      <h2>Intentionally focused for prototype stage</h2>
+      <div class="cards">
+        <div class="card"><h3>What it does</h3><p>Surfaces related Azure resource changes in a selected time window.</p></div>
+        <div class="card"><h3>What it does not claim</h3><p>It does not determine final root cause or replace observability tools.</p></div>
+        <div class="card"><h3>Visibility source</h3><p>Uses Azure Resource Graph and management-plane Activity Logs.</p></div>
+      </div>
+    </section>
+
+    <section id="roadmap" class="section roadmap">
+      <p class="section-label">Potential Enhancements</p>
+      <h2>Practical next steps</h2>
+      <div class="roadmap-list">
+        <div><strong>More Azure resource types</strong><p>VM, App Service, Function App, Key Vault, SQL.</p></div>
+        <div><strong>Cross-subscription visibility</strong><p>Read-only managed identity access across participating subscriptions.</p></div>
+        <div><strong>Connectivity relationships</strong><p>ExpressRoute gateway, VNet connections, DNS, and shared network components.</p></div>
+        <div><strong>Workbook UI</strong><p>A simple incident investigation console for resource and time-window input.</p></div>
+        <div><strong>AWS concept extension</strong><p>Similar pattern using AWS Config and CloudTrail.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Azure ChangeLens</strong> · Prototype Concept · Operational Change Context Explorer
+  </footer>
+</body>
+</html>
